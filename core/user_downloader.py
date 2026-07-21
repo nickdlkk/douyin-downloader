@@ -306,9 +306,7 @@ class UserDownloader(BaseDownloader):
         user_info: Dict[str, Any],
         aweme_list: List[Dict[str, Any]],
         *,
-        item_filter: Optional[
-            Callable[[List[Dict[str, Any]]], List[Dict[str, Any]]]
-        ] = None,
+        item_filter: Optional[Callable[[List[Dict[str, Any]]], List[Dict[str, Any]]]] = None,
     ) -> None:
         browser_cfg = self.config.get("browser_fallback", {}) or {}
         if not browser_cfg.get("enabled", True):
@@ -375,9 +373,7 @@ class UserDownloader(BaseDownloader):
             if not detail:
                 try:
                     await self.rate_limiter.acquire()
-                    detail = await self.api_client.get_video_detail(
-                        aweme_id, suppress_error=True
-                    )
+                    detail = await self.api_client.get_video_detail(aweme_id, suppress_error=True)
                 except Exception as exc:
                     detail_failed += 1
                     logger.warning(
@@ -429,9 +425,7 @@ class UserDownloader(BaseDownloader):
     def _post_recovery_limit_reached(
         items: List[Dict[str, Any]],
         number_limit: Any,
-        item_filter: Optional[
-            Callable[[List[Dict[str, Any]]], List[Dict[str, Any]]]
-        ],
+        item_filter: Optional[Callable[[List[Dict[str, Any]]], List[Dict[str, Any]]]],
     ) -> bool:
         limit = int(number_limit or 0)
         if limit <= 0:
