@@ -15,9 +15,7 @@ from core import DouyinAPIClient, DownloaderFactory, LoginRequiredError, URLPars
 from storage import Database, FileManager
 from utils.logger import set_console_log_level, setup_logger
 from utils.notifier import build_notifier
-from utils.validators import is_short_url, normalize_short_url
-
-logger = setup_logger("CLI")
+from utils.validators import is_short_url, normalize_short_url, extract_urls_from_text
 display = ProgressDisplay()
 
 
@@ -227,9 +225,18 @@ async def main_async(args):
             if url not in config.get("link", []):
                 config.update(link=config.get("link", []) + [url])
 
-    if args.thread:
-        config.update(thread=args.thread)
-
+    # 从分享文本提取链接
+    if args.text:
+        text_urls = args.text if isinstance(args.text, list) else [args.text]
+        for text in text_urls:
+            extracted = extract_urls_from_text(text)
+            for url in extracted:
+                if url not in config.get("link", []):
+                    config.update(link=config.get("link", []) + [url])
+            if extracted:
+                display.print_info(f"从分享文本中提取到 {len(extracted)} 个链接")
+            else:
+                display.print_warning(f"未从分享文本中提取到链接: {text[:50]}...")
     if not config.validate():
         display.print_error("Invalid configuration: missing required fields")
         return
@@ -384,6 +391,7 @@ async def _dispatch_notifications(config: ConfigLoader, total_result: Any, url_c
 def main():
     parser = argparse.ArgumentParser(description="Douyin Downloader - 抖音批量下载工具")
     parser.add_argument("-u", "--url", action="append", help="Download URL(s)")
+    parser.add_argument("-T", "--text", action="append", help="Extract URLs from share text")
     parser.add_argument("-c", "--config", help="Config file path (default: config.yml)")
     parser.add_argument("-p", "--path", help="Save path")
     parser.add_argument("-t", "--thread", type=int, help="Thread count")
@@ -442,7 +450,3 @@ def main():
         display.print_error(f"Fatal error: {e}")
         logger.exception("Fatal error occurred")
         sys.exit(1)
-
-
-if __name__ == "__main__":
-    main()

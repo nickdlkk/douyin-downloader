@@ -134,3 +134,25 @@ def parse_url_type(url: str) -> Optional[str]:
     if re.fullmatch(r"/(?:follow/|share/)?live/\d+/?", path):
         return "live"
     return None
+# 分享文本链接提取
+_SHARE_TEXT_URL_PATTERN = re.compile(
+    r"https?://[^\s<>\"]+douyin\.com[^\s<>\"]*",
+    re.IGNORECASE,
+)
+
+
+def extract_urls_from_text(text: str) -> list[str]:
+    """从分享文本中提取所有抖音链接。"""
+    if not text:
+        return []
+    matches = _SHARE_TEXT_URL_PATTERN.findall(text)
+    # 去重并保持顺序
+    seen: set[str] = set()
+    result: list[str] = []
+    for url in matches:
+        # 清理 URL 末尾的标点
+        cleaned = url.rstrip(".,;:!?)。，；：！？")
+        if cleaned not in seen:
+            seen.add(cleaned)
+            result.append(cleaned)
+    return result
