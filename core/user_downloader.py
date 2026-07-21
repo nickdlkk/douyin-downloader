@@ -11,6 +11,7 @@ logger = setup_logger("UserDownloader")
 
 class UserDownloader(BaseDownloader):
     SELF_COLLECT_MODES = {"collect", "collectmix"}
+    SELF_LIKE_MODES = {"my_like"}
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -101,6 +102,12 @@ class UserDownloader(BaseDownloader):
         if has_collect_mode and has_regular_mode:
             logger.error("Modes collect/collectmix cannot be combined with post/like/mix/music")
             return False
+        has_my_like_mode = bool(normalized_modes & self.SELF_LIKE_MODES)
+        # my_like is also a self-only mode — treat it the same as collect for
+        # the purpose of detecting "regular" (non-self) mode combinations.
+        if has_my_like_mode and bool(normalized_modes - self.SELF_COLLECT_MODES - self.SELF_LIKE_MODES):
+            logger.error("Mode my_like cannot be combined with post/like/mix/music/collect")
+            return False
         return True
 
     def _filter_pinned_items(self, items: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
@@ -128,6 +135,14 @@ class UserDownloader(BaseDownloader):
         normalized_modes = {str(mode or "").strip() for mode in modes}
         if sec_uid == "self" and normalized_modes.issubset(self.SELF_COLLECT_MODES):
             self._progress_update_step("获取作者信息", "使用当前登录账号收藏夹上下文")
+            return {
+                "uid": "self",
+                "sec_uid": "self",
+                "nickname": "self",
+            }
+
+        if sec_uid == "self" and normalized_modes.issubset(self.SELF_LIKE_MODES):
+            self._progress_update_step("获取作者信息", "使用当前登录账号喜欢列表上下文")
             return {
                 "uid": "self",
                 "sec_uid": "self",

@@ -9,6 +9,7 @@ from core.user_modes import (
     LikeUserModeStrategy,
     MixUserModeStrategy,
     MusicUserModeStrategy,
+    MyLikeUserModeStrategy,
     PostUserModeStrategy,
 )
 
@@ -22,6 +23,7 @@ class UserModeRegistry:
             "music": MusicUserModeStrategy,
             "collect": CollectUserModeStrategy,
             "collectmix": CollectMixUserModeStrategy,
+            "my_like": MyLikeUserModeStrategy,
         }
 
     def get(self, mode: str) -> Optional[Type[BaseUserModeStrategy]]:

@@ -41,6 +41,7 @@ number:
   music: 0
   collect: 0
   collectmix: 0
+  my_like: 0
 
 increase:
   post: false

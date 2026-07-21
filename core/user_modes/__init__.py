@@ -4,6 +4,7 @@ from .collect_strategy import CollectUserModeStrategy
 from .like_strategy import LikeUserModeStrategy
 from .mix_strategy import MixUserModeStrategy
 from .music_strategy import MusicUserModeStrategy
+from .my_like_strategy import MyLikeUserModeStrategy
 from .post_strategy import PostUserModeStrategy
 
 __all__ = [
@@ -12,6 +13,7 @@ __all__ = [
     "CollectUserModeStrategy",
     "PostUserModeStrategy",
     "LikeUserModeStrategy",
+    "MyLikeUserModeStrategy",
     "MixUserModeStrategy",
     "MusicUserModeStrategy",
 ]
